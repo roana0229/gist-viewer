@@ -1,0 +1,10 @@
+disabled_rules:
+  - unused_optional_binding
+  - trailing_comma
+included:
+  - StructurePlayground
+  - StructurePlaygroundTests
+  - StructurePlaygroundUITests
+excluded:
+  - Carthage
+  - Pods

@@ -1,0 +1,124 @@
+name: StructurePlayground
+options:
+  bundleIdPrefix: org.roana0229
+  deploymentInfo:
+    devices: ["iPhone"]
+targets:
+  StructurePlayground:
+    templates: 
+      - Base
+    type: application
+    configFiles:
+      Debug: Configs/debug.xcconfig
+      Release: Configs/release.xcconfig
+    dependencies:
+      - target: StructurePlaygroundCore
+      - target: StructurePlaygroundUI
+      - target: StructurePlaygroundRepository
+      - target: GitHubAPI
+  StructurePlaygroundUI:
+    templates:
+      - Framework
+    dependencies:
+      - target: StructurePlaygroundCore
+      - target: StructurePlaygroundRepository
+  StructurePlaygroundRepository:
+    templates: 
+      - Framework
+    dependencies:
+      - target: StructurePlaygroundCore
+      - target: GitHubAPI
+  GitHubAPI:
+    templates: 
+      - Framework
+    dependencies:
+      - target: StructurePlaygroundCore
+      - carthage: Alamofire
+  StructurePlaygroundCore:
+    templates: 
+      - Framework
+  StructurePlaygroundTests:
+    templates: 
+      - Test
+    type: bundle.unit-test
+    settings:
+      TEST_HOST: $(BUILT_PRODUCTS_DIR)/StructurePlayground.app/StructurePlayground
+  StructurePlaygroundUITests:
+    templates: 
+      - Test
+    type: bundle.ui-testing
+targetTemplates:
+  Base:
+    platform: iOS
+    deploymentTarget: "13.0"
+    sources:
+      - ${target_name}
+    settings:
+      TARGETED_DEVICE_FAMILY: 1
+      INFOPLIST_FILE: ${target_name}/Info.plist
+    preBuildScripts:
+    postBuildScripts:
+      - script: (git diff --diff-filter=d --name-only; git diff --diff-filter=d --staged --name-only;) | grep -e "^\s*[^ D].*\.swift$" | xargs mint run swiftformat
+        name: Run SwiftFormat
+      - script: mint run swiftlint
+        name: Run SwiftLint
+  Framework:
+    templates: 
+      - Base
+    type: framework
+    info:
+      path: ${target_name}/Info.plist
+  Test:
+    templates: 
+      - Base
+    info:
+      path: ${target_name}/Info.plist
+    dependencies:
+      - target: StructurePlayground
+schemes:
+  StructurePlayground-Debug:
+    build:
+      targets:
+        StructurePlayground: all
+        StructurePlaygroundUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      gatherCoverageData: true
+      coverageTargets:
+        - StructurePlayground
+      targets: 
+        - name: StructurePlaygroundTests
+          parallelizable: true
+          randomExecutionOrder: true
+        - StructurePlaygroundUITests
+    profile: 
+      config: Debug
+    analyze:
+      config: Debug
+    archive: 
+      config: Debug
+  StructurePlayground-Release:
+    build:
+      targets:
+        StructurePlayground: all
+        StructurePlaygroundUITests: [test]
+    run:
+      config: Release
+    test:
+      config: Release
+      gatherCoverageData: true
+      coverageTargets:
+        - StructurePlayground
+      targets: 
+        - name: StructurePlaygroundTests
+          parallelizable: true
+          randomExecutionOrder: true
+        - StructurePlaygroundUITests
+    profile: 
+      config: Release
+    analyze:
+      config: Release
+    archive: 
+      config: Release
