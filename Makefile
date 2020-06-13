@@ -15,7 +15,8 @@ build:
 	open StructurePlayground.xcodeproj
 
 build-library:
-	carthage bootstrap --platform iOS --cache-builds
+	mint bootstrap
+	mint run carthage bootstrap --platform iOS --cache-builds
 
 update-library:
-	carthage update --platform iOS
+	mint run carthage update --platform iOS
